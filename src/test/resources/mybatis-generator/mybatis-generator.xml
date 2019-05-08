@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+
+    <context id="MSTables" targetRuntime="MyBatis3" defaultModelType="flat">
+        <property name="mybatisVersion" value="3.5.1"/>
+        <property name="autoDelimitKeywords" value="true"/>
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+        <property name="javaFileEncoding" value="utf-8"/>
+
+        <!--插件-->
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <plugin type="com.itfsw.mybatis.generator.plugins.SelectOneByExamplePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.UnmergeableXmlMappersPlugin"/>
+        <!-- MySQL分页插件 -->
+        <plugin type="com.itfsw.mybatis.generator.plugins.LimitPlugin">
+            <!-- 通过配置startPage影响Example中的page方法开始分页的页码，默认分页从0开始 -->
+            <property name="startPage" value="0"/>
+        </plugin>
+
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://192.168.56.101:3306/mindoc_db"
+                        userId="root"
+                        password="111111">
+        </jdbcConnection>
+
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+
+        <javaModelGenerator targetPackage="io.github.mylyed.lessdoc.persist.entity"
+                            targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <sqlMapGenerator targetPackage="io.github.mylyed.lessdoc.persist.mapper"
+                         targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="io.github.mylyed.lessdoc.persist.mapper"
+                             targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+
+
+        <table tableName="md_members" domainObjectName="Member" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true" enableSelectByExample="true" selectByExampleQueryId="true">
+
+
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+            <!--            <columnOverride column="member_id" jdbcType="INTEGER" property="memberId" javaType="java.lang.Long"/>-->
+        </table>
+
+
+        <table tableName="md_attachment" domainObjectName="Attachment" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+
+        </table>
+
+        <!--        <table tableName="md_blogs" domainObjectName="Blog" enableCountByExample="true"-->
+        <!--               enableUpdateByExample="true"-->
+        <!--               enableDeleteByExample="true"-->
+        <!--               enableSelectByExample="true"-->
+        <!--               selectByExampleQueryId="true">-->
+        <!--            <columnRenamingRule searchString="^D_" replaceString=""/>-->
+        <!--        </table>-->
+
+        <table tableName="md_books" domainObjectName="Book" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+            <columnOverride column="is_use_first_document" jdbcType="INTEGER" property="useFirstDocument"
+                            javaType="java.lang.Boolean"/>
+
+        </table>
+
+        <table tableName="md_document_history" domainObjectName="DocumentHistory" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+
+
+        <table tableName="md_documents" domainObjectName="Document" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+            <columnOverride column="is_open" jdbcType="INTEGER" property="isOpen" javaType="java.lang.Boolean"/>
+        </table>
+
+
+        <table tableName="md_itemsets" domainObjectName="Itemset" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+        <table tableName="md_label" domainObjectName="Label" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+
+
+        <table tableName="md_logs" domainObjectName="Log" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+        <table tableName="md_member_token" domainObjectName="MemberToken" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+        <table tableName="md_migrations" domainObjectName="Migration" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+        <table tableName="md_options" domainObjectName="Option" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+        <table tableName="md_relationship" domainObjectName="Relationship" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+        <table tableName="md_team_member" domainObjectName="TeamMember" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+        <table tableName="md_team_relationship" domainObjectName="TeamRelationship" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+        <table tableName="md_teams" domainObjectName="Team" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+        <table tableName="md_templates" domainObjectName="Template" enableCountByExample="true"
+               enableUpdateByExample="true"
+               enableDeleteByExample="true"
+               enableSelectByExample="true"
+               selectByExampleQueryId="true">
+            <columnRenamingRule searchString="^D_" replaceString=""/>
+        </table>
+
+
+    </context>
+
+</generatorConfiguration>
