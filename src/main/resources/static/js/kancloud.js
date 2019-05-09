@@ -1,5 +1,6 @@
 var events = function () {
     var articleOpen = function (event, $param) {
+        console.log($param)
         //当打开文档时，将文档ID加入到本地缓存。
         window.sessionStorage && window.sessionStorage.setItem("MinDoc::LastLoadDocument:" + window.book.identify, $param.$id);
         var prevState = window.history.state || {};
@@ -57,14 +58,15 @@ function loadDocument($url, $id, $callback) {
             var data = events.data($id);
             if (data) {
                 if (typeof $callback === "function") {
-                    data.body = $callback(data.body);
+                    data.release = $callback(data.release);
                 } else if (data.version && data.version != $callback) {
                     return true;
                 }
-                $("#page-content").html(data.body);
-                $("title").text(data.title);
-                $("#article-title").text(data.doc_title);
-                $("#article-info").text(data.doc_info);
+                //没懂
+                // console.log("从浏览器缓存中找到了文档");
+                $("#page-content").html(data.release);
+                $("title").text(data.documentName + "- Powered by " + LOGO);
+                $("#article-title").text(data.documentName);
 
                 events.trigger('article.open', {$url: $url, $id: $id});
 
@@ -76,10 +78,12 @@ function loadDocument($url, $id, $callback) {
         },
         success: function (res) {
             if (res.errcode === 0) {
-                var body = res.data.body;
-                var doc_title = res.data.doc_title;
-                var title = res.data.title;
-                var doc_info = res.data.doc_info;
+
+
+                var body = res.data.release;
+                var doc_title = res.data.documentName;
+                var title = doc_title + "- Powered by " + LOGO;
+
 
                 $body = body;
                 if (typeof $callback === "function") {
@@ -89,7 +93,6 @@ function loadDocument($url, $id, $callback) {
                 $("#page-content").html($body);
                 $("title").text(title);
                 $("#article-title").text(doc_title);
-                $("#article-info").text(doc_info);
 
                 events.data($id, res.data);
 
@@ -130,6 +133,55 @@ function initHighlighting() {
     }
 }
 
+/**
+ * 初始化
+ * @param $data
+ */
+function initTree($data) {
+    window.jsTree = $("#sidebar").jstree({
+        'plugins': ["wholerow", "types"],
+        "types": {
+            "default": {
+                "icon": false  // 删除默认图标
+            }
+        },
+        'core': {
+            'check_callback': true,
+            "multiple": false,
+            'animation': 0,
+            "data": $data
+        }
+    }).on('select_node.jstree', function (node, selected, event) {
+        $(".m-manual").removeClass('manual-mobile-show-left');
+        loadDocument(selected.node.a_attr.href, selected.node.original.identify, selected.node.a_attr['data-version']);
+    });
+
+    window.onpopstate = function (e) {
+        var $param = e.state;
+        if (!$param) return;
+        if ($param.hasOwnProperty("$url")) {
+            window.jsTree.jstree().deselect_all();
+
+            if ($param.$id) {
+                window.jsTree.jstree().select_node({id: $param.$id});
+            } else {
+                window.location.assign($param.$url);
+            }
+            // events.trigger('article.open', $param);
+        } else {
+            console.log($param);
+        }
+    };
+    try {
+        var $node = window.jsTree.jstree().get_selected();
+        if ($node instanceof Array && $node.length) {
+            $node = window.jsTree.jstree().get_node({id: $node[0]});
+            events.trigger('article.open', {$url: $node.a_attr.href, $id: $node.id});
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
 
 $(function () {
     $(".view-backtop").on("click", function () {
@@ -189,40 +241,12 @@ $(function () {
     window.isFullScreen = false;
 
     initHighlighting();
-    window.jsTree = $("#sidebar").jstree({
-        'plugins': ["wholerow", "types"],
-        "types": {
-            "default": {
-                "icon": false  // 删除默认图标
-            }
-        },
-        'core': {
-            'check_callback': true,
-            "multiple": false,
-            'animation': 0
-        }
-    }).on('select_node.jstree', function (node, selected, event) {
-        $(".m-manual").removeClass('manual-mobile-show-left');
-        loadDocument(selected.node.a_attr.href, selected.node.id, selected.node.a_attr['data-version']);
-    });
 
     $("#slidebar").on("click", function () {
         $(".m-manual").addClass('manual-mobile-show-left');
     });
     $(".manual-mask").on("click", function () {
         $(".m-manual").removeClass('manual-mobile-show-left');
-    });
-
-    /**
-     * 关闭侧边栏
-     */
-    $(".manual-fullscreen-switch").on("click", function () {
-        isFullScreen = !isFullScreen;
-        if (isFullScreen) {
-            $(".m-manual").addClass('manual-fullscreen-active');
-        } else {
-            $(".m-manual").removeClass('manual-fullscreen-active');
-        }
     });
 
     $(".navg-item[data-mode]").on("click", function () {
@@ -250,7 +274,7 @@ $(function () {
             if (res.errcode === 0) {
                 for (var i in res.data) {
                     var item = res.data[i];
-                    html += '<li><a href="javascript:;" title="' + item.doc_name + '" data-id="' + item.doc_id + '"> ' + item.doc_name + ' </a></li>';
+                    html += '<li><a href="javascript:;" title="' + item.documentName + '" data-id="' + item.identify + '"> ' + item.documentName + ' </a></li>';
                 }
             }
             if (html !== "") {
@@ -265,29 +289,5 @@ $(function () {
         }
     });
 
-    window.onpopstate = function (e) {
-        var $param = e.state;
-        if (!$param) return;
-        if ($param.hasOwnProperty("$url")) {
-            window.jsTree.jstree().deselect_all();
 
-            if ($param.$id) {
-                window.jsTree.jstree().select_node({id: $param.$id});
-            } else {
-                window.location.assign($param.$url);
-            }
-            // events.trigger('article.open', $param);
-        } else {
-            console.log($param);
-        }
-    };
-    try {
-        var $node = window.jsTree.jstree().get_selected();
-        if ($node instanceof Array && $node.length) {
-            $node = window.jsTree.jstree().get_node({id: $node[0]});
-            events.trigger('article.open', {$url: $node.a_attr.href, $id: $node.id});
-        }
-    } catch (e) {
-        console.log(e);
-    }
 });

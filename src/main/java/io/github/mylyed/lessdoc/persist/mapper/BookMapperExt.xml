@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.mylyed.lessdoc.persist.mapper.BookMapperExt">
+
+
+    <select id="select4Anonymous" resultType="io.github.mylyed.lessdoc.model.HomeBook">
+			SELECT
+				book.identify,
+				book.book_name AS bookName,
+				book.cover,
+				member.account AS createAccount,
+				member.real_name as createRealName
+			FROM
+				md_books AS book
+			LEFT JOIN md_relationship AS rel ON rel.book_id = book.book_id
+			AND rel.role_id = 0
+			LEFT JOIN md_members AS member ON rel.member_id = member.member_id
+			WHERE
+				book.privately_owned = 0
+			ORDER BY
+				order_index DESC,
+				book.book_id DESC
+
+				limit ${offset}, ${rows}
+
+    </select>
+    <select id="count4Anonymous" resultType="java.lang.Long">
+            SELECT count(1) from md_books where privately_owned=0
+    </select>
+</mapper>

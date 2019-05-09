@@ -17,9 +17,6 @@ public class DocumentTree {
 
     private boolean open;
 
-//    private String state;// *DocumentSelected `json:"-"`
-//    private Map<String, Object> aAttrs = new HashMap<>();// map[string]interface{}		`json:"a_attr"`
-
 
     private List<DocumentTree> children;
 

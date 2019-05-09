@@ -10,10 +10,9 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
         <meta name="renderer" content="webkit"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="author" content="MinDoc"/>
-        <title>${title} - Powered by MinDoc</title>
-        <meta name="keywords" content="MinDoc,文档在线管理系统,WIKI,wiki,wiki在线,文档在线管理,接口文档在线管理,接口文档管理">
-        <meta name="description" content="MinDoc文档在线管理系统 ${site_description!}">
+
+        <title>${title} - Powered by ${LOGO}</title>
+        <meta name="description" content="${site_description!}">
         <link href="${ctx}/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <link href="${ctx}/static/font-awesome/css/font-awesome.min.css" rel="stylesheet">
         <link href="${ctx}/static/css/main.css?v=20190311163719" rel="stylesheet">

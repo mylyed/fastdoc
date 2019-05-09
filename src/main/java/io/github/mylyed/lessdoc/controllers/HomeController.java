@@ -1,8 +1,8 @@
 package io.github.mylyed.lessdoc.controllers;
 
-import io.github.mylyed.lessdoc.persist.entity.Book;
-import io.github.mylyed.lessdoc.persist.entity.BookExample;
-import io.github.mylyed.lessdoc.persist.mapper.BookMapper;
+import io.github.mylyed.lessdoc.model.HomeBook;
+import io.github.mylyed.lessdoc.model.Limit;
+import io.github.mylyed.lessdoc.persist.mapper.BookMapperExt;
 import io.github.mylyed.lessdoc.response.Pagination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,22 +29,22 @@ import java.util.Map;
 public class HomeController extends BaseController {
 
     @Resource
-    BookMapper bookMapper;
+    BookMapperExt bookMapperExt;
 
 
     @RequestMapping({"", "/", "/index"})
     public String index(Model model, Integer page) {
 
+
+        //匿名访问 TODO
+
         int pageIndex = page == null ? 1 : page;
         int pageSize = 18;
 
-
-        BookExample bookExample = new BookExample();
-        bookExample.page(pageIndex - 1, pageSize);
-        List<Book> books = bookMapper.selectByExample(bookExample);
-        long count = bookMapper.countByExample(bookExample);
+        List<HomeBook> books = bookMapperExt.select4Anonymous(Limit.page(pageIndex - 1, pageSize));
+        log.debug("books={}", books);
+        long count = bookMapperExt.count4Anonymous();
         model.addAttribute("books", books);
-
         Pagination pagination = new Pagination(pageIndex, pageSize, count);
         model.addAttribute("pagination", pagination);
         return "home/index";

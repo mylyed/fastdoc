@@ -1,4 +1,8 @@
 $(function () {
+
+    if (window.isFullScreen == undefined) {
+        window.isFullScreen = false;
+    }
     var splitBar = {
         // 设置当前屏幕为 840px 时将分割条隐藏
         maxWidth: 840,
@@ -12,8 +16,8 @@ $(function () {
         init: function () {
             var self = this;
             $(self.parentSelector)
-            .append(
-                $('\
+                .append(
+                    $('\
                     <div id="manual-vsplitbar" unselectable="on"\
                     style="\
                         z-index:301;\
@@ -27,15 +31,15 @@ $(function () {
                         <a href="javascript:void(0)" accesskey="" tabindex="0" title="vsplitbar"></a>\
                     </div>\
                 ')
-                .hover(
-                    function (event) {
-                        event.target.style.background = '#8f949ad8';
-                    },
-                    function (event) {
-                        event.target.style.background = '';
-                    }
-                )
-            );
+                        .hover(
+                            function (event) {
+                                event.target.style.background = '#8f949ad8';
+                            },
+                            function (event) {
+                                event.target.style.background = '';
+                            }
+                        )
+                );
 
             self.loadingHtml();
 
@@ -45,7 +49,7 @@ $(function () {
 
         /**
          * 加载页面时设置分割条是否显示
-         */ 
+         */
         loadingHtml: function () {
             var self = this;
             var htmlWidth = document.body.clientWidth;
@@ -62,7 +66,7 @@ $(function () {
                 splitBar.inMaxWidthReset();
                 $('.manual-left').css('width', '0px');
             } else {
-                 // 打开菜单时，初始化左右窗口
+                // 打开菜单时，初始化左右窗口
                 $('#manual-vsplitbar').css('display', 'block');
                 splitBar.outMaxWidthReset();
             }
@@ -96,7 +100,7 @@ $(function () {
 
         /**
          * 添加媒体查询监听事件
-         */ 
+         */
         set: function () {
             var self = this;
             self.mql.addListener(self.mqCallback);
@@ -125,7 +129,7 @@ $(function () {
 
     // 初始化分割条
     splitBar.init();
-    
+
     /**
      * 控制菜单宽度
      * 最小为 140px
@@ -166,6 +170,18 @@ $(function () {
 
         splitBar.setCapture && splitBar.setCapture();
         return false;
+    });
+
+    /**
+     * 关闭侧边栏
+     */
+    $(".manual-fullscreen-switch").on("click", function () {
+        isFullScreen = !isFullScreen;
+        if (isFullScreen) {
+            $(".m-manual").addClass('manual-fullscreen-active');
+        } else {
+            $(".m-manual").removeClass('manual-fullscreen-active');
+        }
     });
 
     /**

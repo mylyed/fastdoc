@@ -6,6 +6,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 个人设置中心
@@ -38,6 +39,7 @@ public class SettingController {
      * @return
      */
     @PostMapping("/password")
+    @ResponseBody
     public JsonResponse updatePassword(String password1, String password2, String password3) {
         Assert.hasText(password1, "原密码不能为空");
         Assert.hasText(password2, "新密码不能为空");

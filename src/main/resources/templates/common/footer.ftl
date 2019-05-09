@@ -1,7 +1,7 @@
 <div class="footer">
     <div class="container">
         <div class="row text-center border-top">
-            <span><a href="https://www.iminho.me" target="_blank">官方网站</a></span>
+            <span><a href="${HOME_PAGE}" target="_blank">官方网站</a></span>
             <span>&nbsp;·&nbsp;</span>
             <span><a href="https://github.com/lifei6671/mindoc/issues" target="_blank">意见反馈</a></span>
             <span>&nbsp;·&nbsp;</span>

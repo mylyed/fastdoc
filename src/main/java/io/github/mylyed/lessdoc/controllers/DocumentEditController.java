@@ -28,7 +28,7 @@ import java.util.Map;
  */
 
 @Controller
-@RequestMapping("edit")
+@RequestMapping("doc/edit")
 public class DocumentEditController {
     Logger log = LoggerFactory.getLogger(DocumentEditController.class);
 
@@ -75,16 +75,8 @@ public class DocumentEditController {
         }
         model.addAttribute("documentCategory", objectMapper.writeValueAsString(tree));
 
-        // 根据不同编辑器类型加载编辑器
-//        if bookResult.Editor == "markdown" {
-//            c.TplName = "document/markdown_edit_template.tpl"
-//        } else if bookResult.Editor == "html" {
-//            c.TplName = "document/new_html_edit_template.tpl"
-//        } else {
-//            c.TplName = "document/" + bookResult.Editor + "_edit_template.tpl"
-//        }
 
-        return "edit/markdown_edit_template";
+        return "document/edit/markdown_edit_template";
     }
 
 

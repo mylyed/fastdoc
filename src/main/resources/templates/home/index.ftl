@@ -13,28 +13,22 @@
                     <div class="list-item">
                         <dl class="manual-item-standard">
                             <dt>
-                                <a href="${ctx}/docs/${item.identify}"
-                                   title="${item.bookName!}-${item.createName!}" target="_blank">
+                                <a href="${ctx}/doc/read/${item.identify}"
+                                   title="${item.bookName!}-${item.author!}" target="_blank">
                                     <img src="${item.cover!}" class="cover"
-                                         alt="${item.bookName!}-${item.createName!}"
-                                         onerror="this.src='${ctx}/static/images/book.jpg" }}';">
+                                         alt="${item.bookName!}-${item.author!}"
+                                         onerror="this.src='${ctx}/static/images/book.jpg';">
                                 </a>
                             </dt>
                             <dd>
-                                <a href="${ctx}/docs/${item.identify}" class="name"
-                                   title="${item.bookName!}-${item.createName!}" target="_blank">${item.bookName!}</a>
+                                <a href="${ctx}/doc/read/${item.identify}" class="name"
+                                   title="${item.bookName!}-${item.author!}" target="_blank">${item.bookName!}</a>
                             </dd>
                             <dd>
                             <span class="author">
                                 <b class="text">作者</b>
                                 <b class="text">-</b>
-                                <b class="text">
-                                    <#if item.realName?? && item.realName!="">
-                                        ${item.realName!}
-                                    <#else >
-                                        ${item.createName!}
-                                    </#if>
-                                </b>
+                                <b class="text">${item.author!}</b>
                             </span>
                             </dd>
                         </dl>

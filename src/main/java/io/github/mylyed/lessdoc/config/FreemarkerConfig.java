@@ -31,7 +31,10 @@ public class FreemarkerConfig {
     private OptionService optionService;
 
     @PostConstruct
-    public void setConfigure() {
+    public void setConfigure() throws TemplateModelException {
+        configuration.setSharedVariable("LOGO", "LessDoc");
+        configuration.setSharedVariable("HOME_PAGE", "http://mylyed.github.io");
+
         optionService.allOptions().forEach((k, v) -> {
             try {
                 configuration.setSharedVariable(k, v);

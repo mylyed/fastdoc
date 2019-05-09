@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>编辑文档 - Powered by MinDoc</title>
+    <title>编辑文档 - Powered by ${LOGO}</title>
     <script type="text/javascript">
         window.treeCatalog = null;
         window.baseUrl = "${ctx}"
@@ -201,7 +201,8 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">文档名称 <span class="error-message">*</span></label>
                         <div class="col-sm-10">
-                            <input type="text" name="documentName" id="documentName" placeholder="文档名称" class="form-control"
+                            <input type="text" name="documentName" id="documentName" placeholder="文档名称"
+                                   class="form-control"
                                    maxlength="50">
                             <p style="color: #999;font-size: 12px;">在目录的文档名上右键可以删除和修改文档名称以及添加下级文档</p>
 
