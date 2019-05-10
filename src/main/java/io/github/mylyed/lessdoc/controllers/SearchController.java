@@ -11,6 +11,7 @@ import io.github.mylyed.lessdoc.service.BookService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -58,11 +59,12 @@ public class SearchController {
         JsonResponse jsonResponse = new JsonResponse();
         if (StringUtils.isNotEmpty(keyword)) {
             Book book = bookService.findBookByIdentify(bookIdentify);
-
+            Assert.notNull(book, "项目不存在");
             DocumentExample example = new DocumentExample();
             //TODO
             example.createCriteria().andBookIdEqualTo(book.getBookId())
                     .andDocumentNameLike("%" + keyword.trim() + "%");
+
 
             List<Document> documents = documentMapper.selectByExample(example);
             jsonResponse.setData(documents);

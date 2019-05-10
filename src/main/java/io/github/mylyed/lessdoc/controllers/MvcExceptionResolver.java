@@ -1,5 +1,7 @@
 package io.github.mylyed.lessdoc.controllers;
 
+import io.github.mylyed.lessdoc.exception.DocumentVersionException;
+import io.github.mylyed.lessdoc.exception.LessDocException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -36,7 +38,13 @@ public class MvcExceptionResolver implements HandlerExceptionResolver {
         } else {
             modelAndView = new ModelAndView("error/error");
         }
-        modelAndView.addObject("errcode", 500);
+
+        int errcode = 500;
+        if (ex instanceof LessDocException) {
+            errcode = ((LessDocException) ex).errorCode();
+        }
+
+        modelAndView.addObject("errcode", errcode);
         modelAndView.addObject("message", ex.getMessage());
         return modelAndView;
 

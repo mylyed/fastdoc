@@ -4,7 +4,6 @@ import io.github.mylyed.lessdoc.persist.entity.Book;
 import io.github.mylyed.lessdoc.persist.entity.Document;
 import io.github.mylyed.lessdoc.persist.entity.DocumentExample;
 import io.github.mylyed.lessdoc.persist.mapper.DocumentMapper;
-import io.github.mylyed.lessdoc.response.DocumentTree;
 import io.github.mylyed.lessdoc.response.JsonResponse;
 import io.github.mylyed.lessdoc.service.BookService;
 import io.github.mylyed.lessdoc.service.DocumentService;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * 文档
@@ -55,8 +53,7 @@ public class DocumentReadController {
         Assert.notNull(book, "项目不存在");
         model.addAttribute("book", book);
 
-        List<DocumentTree> documentTrees = documentService.findDocsTreeByBook(book);
-        model.addAttribute("documentTrees", documentTrees);
+
         String title, content;
         Integer documentId = -1;
 

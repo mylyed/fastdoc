@@ -1,7 +1,5 @@
 package io.github.mylyed.lessdoc.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.mylyed.lessdoc.persist.entity.Book;
 import io.github.mylyed.lessdoc.persist.entity.Document;
 import io.github.mylyed.lessdoc.response.JsonResponse;
@@ -15,10 +13,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 文档编辑
@@ -38,8 +32,6 @@ public class DocumentEditController {
     @Resource
     BookService bookService;
 
-    @Resource
-    ObjectMapper objectMapper;
 
     /**
      * 跳转到辑页面
@@ -48,46 +40,40 @@ public class DocumentEditController {
      */
     @GetMapping("/{bookIdentify}")
     public String editPage(Model model,
-                           @PathVariable("bookIdentify") String bookIdentify) throws JsonProcessingException {
+                           @PathVariable("bookIdentify") String bookIdentify) {
         Book book = bookService.findBookByIdentify(bookIdentify);
         Assert.notNull(book, "项目不存在");
         model.addAttribute("book", book);
-        List<Document> documents = documentService.findDocsByBook(book);
-
-        List<Map<String, Object>> tree = new ArrayList<>(documents.size());
-        for (Document document : documents) {
-            Map<String, Object> node = new LinkedHashMap<>(6);
-            node.put("id", document.getDocumentId());
-            node.put("text", document.getDocumentName());
-            node.put("parent", document.getParentId() == 0 ? "#" : document.getParentId());
-            node.put("identify", document.getIdentify());
-            node.put("version", document.getVersion());
-            if (document.getIsOpen()) {
-                Map<String, Object> attr = new LinkedHashMap<>(6);
-                attr.put("is_open", true);
-                node.put("a_attr", attr);
-
-                Map<String, Object> state = new LinkedHashMap<>(6);
-                state.put("opened", true);
-                node.put("state", state);
-            }
-            tree.add(node);
-        }
-        model.addAttribute("documentCategory", objectMapper.writeValueAsString(tree));
-
 
         return "document/edit/markdown_edit_template";
     }
 
 
-    @PostMapping("")
+    /**
+     * 保存或者修改文档信息
+     *
+     * @param document 文档信息
+     * @param cover    是否强制覆盖
+     * @return
+     */
+    @PostMapping()
     @ResponseBody
-    public JsonResponse saveDoc(Document document, boolean cover) {
+    public JsonResponse saveOrUpdate(Document document, boolean cover) {
         log.debug("document={}", document);
         log.debug("cover={}", cover);
         documentService.saveOrUpdate(document, cover);
         JsonResponse response = new JsonResponse();
         response.setData(document);
+        return response;
+    }
+
+
+    @DeleteMapping()
+    @ResponseBody
+    public JsonResponse delete(Document document) {
+        log.debug("document={}", document);
+        documentService.deleteDoc(document);
+        JsonResponse response = new JsonResponse();
         return response;
     }
 

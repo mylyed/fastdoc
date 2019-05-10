@@ -156,7 +156,7 @@ $(function () {
             shade: [0.1, '#fff'] // 0.1 透明度的白色背景
         });
 
-        $.get(window.docRawURL + $node.node.id).done(function (res) {
+        $.get(window.docMarkdownURL + $node.node.id).done(function (res) {
             layer.close(index);
 
             if (res.errcode === 0) {
@@ -169,9 +169,9 @@ $(function () {
                     console.log(e);
                 }
                 var node = {
-                    "id": res.data.doc_id,
-                    'parent': res.data.parent_id === 0 ? '#' : res.data.parent_id,
-                    "text": res.data.doc_name,
+                    "id": res.data.documentId,
+                    'parent': res.data.parentId === 0 ? '#' : res.data.parentId,
+                    "text": res.data.documentName,
                     "identify": res.data.identify,
                     "version": res.data.version
                 };
@@ -210,6 +210,7 @@ $(function () {
 
         var doc_id = parseInt(node.id);
 
+        //获取版本号
         for (var i in window.documentCategory) {
             var item = window.documentCategory[i];
 
@@ -218,14 +219,14 @@ $(function () {
                 break;
             }
         }
+
         $.ajax({
             beforeSend: function () {
                 index = layer.load(1, {shade: [0.1, '#fff']});
                 window.saveing = true;
             },
-            url: window.docSaveURL,
+            url: window.docCUDURL,
             data: {
-                "identify": window.book.identify,
                 "documentId": doc_id,
                 "markdown": content,
                 "content": html,
@@ -296,7 +297,7 @@ $(function () {
      * 添加文档
      */
     $("#addDocumentForm").ajaxForm({
-        url: window.docSaveURL,
+        url: window.docCUDURL,
         beforeSubmit: function () {
             var doc_name = $.trim($("#documentName").val());
             if (doc_name === "") {
@@ -307,6 +308,7 @@ $(function () {
         },
         success: function (res) {
             if (res.errcode === 0) {
+                //
                 var data = {
                     "id": res.data.documentId,
                     'parent': res.data.parentId === 0 ? '#' : res.data.parentId,
@@ -319,6 +321,7 @@ $(function () {
 
                 var node = window.treeCatalog.get_node(data.id);
                 if (node) {
+                    //修改
                     window.treeCatalog.rename_node({"id": data.id}, data.text);
                     $("#sidebar").jstree(true).get_node(data.id).a_attr.is_open = data.state.opened;
                 } else {
@@ -337,84 +340,87 @@ $(function () {
     });
 
     /**
-     * 文档目录树
+     * 文档目录树 初始化
      */
-    $("#sidebar").jstree({
-        'plugins': ["wholerow", "types", 'dnd', 'contextmenu'],
-        "types": {
-            "default": {
-                "icon": false  // 删除默认图标
-            }
-        },
-        'core': {
-            'check_callback': true,
-            "multiple": false,
-            'animation': 0,
-            "data": window.documentCategory
-        },
-        "contextmenu": {
-            show_at_node: false,
-            select_node: false,
-            "items": {
-                "添加文档": {
-                    "separator_before": false,
-                    "separator_after": true,
-                    "_disabled": false,
-                    "label": "添加文档",
-                    "icon": "fa fa-plus",
-                    "action": function (data) {
-                        var inst = $.jstree.reference(data.reference),
-                            node = inst.get_node(data.reference);
-
-                        openCreateCatalogDialog(node);
-                    }
-                },
-                "编辑": {
-                    "separator_before": false,
-                    "separator_after": true,
-                    "_disabled": false,
-                    "label": "编辑",
-                    "icon": "fa fa-edit",
-                    "action": function (data) {
-                        var inst = $.jstree.reference(data.reference);
-                        var node = inst.get_node(data.reference);
-                        openEditCatalogDialog(node);
-                    }
-                },
-                "删除": {
-                    "separator_before": false,
-                    "separator_after": true,
-                    "_disabled": false,
-                    "label": "删除",
-                    "icon": "fa fa-trash-o",
-                    "action": function (data) {
-                        var inst = $.jstree.reference(data.reference);
-                        var node = inst.get_node(data.reference);
-                        openDeleteDocumentDialog(node);
+    window.initJstree = function ($node) {
+        window.documentCategory = $node;
+        $("#sidebar").jstree({
+            'plugins': ["wholerow", "types", 'dnd', 'contextmenu'],
+            "types": {
+                "default": {
+                    "icon": false  // 删除默认图标
+                }
+            },
+            'core': {
+                'check_callback': true,
+                "multiple": false,
+                'animation': 0,
+                "data": $node
+            },
+            "contextmenu": {
+                show_at_node: false,
+                select_node: false,
+                "items": {
+                    "添加文档": {
+                        "separator_before": false,
+                        "separator_after": true,
+                        "_disabled": false,
+                        "label": "添加文档",
+                        "icon": "fa fa-plus",
+                        "action": function (data) {
+                            var inst = $.jstree.reference(data.reference),
+                                node = inst.get_node(data.reference);
+                            openCreateCatalogDialog(node);
+                        }
+                    },
+                    "编辑": {
+                        "separator_before": false,
+                        "separator_after": true,
+                        "_disabled": false,
+                        "label": "编辑",
+                        "icon": "fa fa-edit",
+                        "action": function (data) {
+                            var inst = $.jstree.reference(data.reference);
+                            var node = inst.get_node(data.reference);
+                            openEditCatalogDialog(node);
+                        }
+                    },
+                    "删除": {
+                        "separator_before": false,
+                        "separator_after": true,
+                        "_disabled": false,
+                        "label": "删除",
+                        "icon": "fa fa-trash-o",
+                        "action": function (data) {
+                            var inst = $.jstree.reference(data.reference);
+                            var node = inst.get_node(data.reference);
+                            openDeleteDocumentDialog(node);
+                        }
                     }
                 }
             }
-        }
-    }).on("ready.jstree", function () {
-        window.treeCatalog = $("#sidebar").jstree(true);
-
-        //如果没有选中节点则选中默认节点
-        // openLastSelectedNode();
-    }).on('select_node.jstree', function (node, selected, event) {
-
-        if ($("#markdown-save").hasClass('change')) {
-            if (confirm("编辑内容未保存，需要保存吗？")) {
-                saveDocument(false, function () {
-                    loadDocument(selected);
-                });
-                return true;
+        }).on("ready.jstree", function () {
+            window.treeCatalog = $("#sidebar").jstree(true);
+            console.log("treeCatalog=", window.treeCatalog)
+            //如果没有选中节点则选中默认节点
+            // openLastSelectedNode();
+        }).on('select_node.jstree', function (node, selected, event) {
+            //文档点击事件
+            if ($("#markdown-save").hasClass('change')) {
+                if (confirm("编辑内容未保存，需要保存吗？")) {
+                    saveDocument(false, function () {
+                        loadDocument(selected);
+                    });
+                    return true;
+                }
             }
-        }
 
-        loadDocument(selected);
-    }).on("move_node.jstree", jstree_save).on("delete_node.jstree", function ($node, $parent) {
-        openLastSelectedNode();
-    });
+            loadDocument(selected);
+        }).on("move_node.jstree", jstree_save).on("delete_node.jstree", function ($node, $parent) {
+            openLastSelectedNode();
+        });
+    }
+
     /**
      * 打开文档模板
      */

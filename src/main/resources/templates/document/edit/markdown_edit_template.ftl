@@ -8,33 +8,29 @@
 
     <title>编辑文档 - Powered by ${LOGO}</title>
     <script type="text/javascript">
-        window.treeCatalog = null;
-        window.baseUrl = "${ctx}"
-        window.saveing = false;
-        window.katex = {js: "/static/katex/katex", css: "/static/katex/katex"};
-        window.editormdLib = "/static/editor.md/lib/";
-        window.editor = null;
-        window.imageUploadURL = "";
-        window.fileUploadURL = "";
-        window.documentCategory = ${documentCategory!};
-        window.book = {};
-        window.selectNode = null;
-        window.deleteURL = "";
+
+        window.katex = {js: "${ctx}/static/katex/katex", css: "${ctx}/static/katex/katex"};
+        window.editormdLib = "${ctx}/static/editor.md/lib/";
+
         /**
-         * 加载指定的文档到编辑器中
+         * 读取文档的Markdown信息地址
          */
-        window.docRawURL = "${ctx}/docs/raw/";
+        window.docMarkdownURL = "${ctx}/doc/markdown/";
         /**
-         * 保存文档
+         * 新增，修改 删除文档地址
+         */
+        window.docCUDURL = "${ctx}/doc/edit";
+
+        //配置
+        window.book = {identify: "${book.identify}"};
+
+        /**
+         * 文档排序
          * @type {string}
          */
-        window.docSaveURL = "${ctx}/edit";
-        window.releaseURL = "";
-        window.sortURL = "";
-        window.historyURL = "";
-        window.removeAttachURL = "";
-        window.highlightStyle = "";
-        window.template = {"getUrl": "", "listUrl": "", saveUrl: ""}
+        window.docSortURL = "${ctx}/doc/sort";
+
+
     </script>
     <!-- Bootstrap -->
     <link href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -211,7 +207,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label">文档标识 <span class="error-message">&nbsp;</span></label>
                         <div class="col-sm-10">
-                            <input type="text" name="identify" id="documentIdentify" placeholder="文档唯一标识"
+                            <input type="text" name="identify" id="identify" placeholder="文档唯一标识"
                                    class="form-control" maxlength="50">
                             <p style="color: #999;font-size: 12px;">文档标识只能包含小写字母、数字，以及“-”和“_”符号,并且只能小写字母开头</p>
                         </div>
@@ -513,6 +509,49 @@
 <script src="/static/js/markdown.js" type="text/javascript"></script>
 <script type="text/javascript">
     $(function () {
+        //加载目录
+        var index = null;
+        console.log("加载目录")
+        $.ajax({
+            url: "${ctx}/doc/catalog/${book.bookId}",
+            type: "GET",
+            beforeSend: function (xhr) {
+                index = layer.load(1, {shade: [0.1, '#fff']});
+            },
+            success: function (res) {
+                if (res.errcode === 0) {
+                    var nodes = [];
+                    for (var i = 0, l = res.data.length; i < l; i++) {
+                        //进行转换
+                        var json = res.data[i];
+                        var node = {
+                            "id": json.documentId,
+                            'parent': json.parentId === 0 ? '#' : json.parentId,
+                            "text": json.documentName,
+                            "identify": json.identify,
+                            "version": json.version,
+                            "state": {
+                                "opened": json.isOpen
+                            }
+                        };
+                        nodes.push(node)
+                    }
+                    window.initJstree(nodes)
+                } else if (res.errcode === 6000) {
+                    window.location.href = "/";
+                } else {
+                    layer.msg(res.message);
+                }
+            },
+            complete: function () {
+                layer.close(index);
+            },
+            error: function () {
+                layer.msg("加载失败");
+            }
+        });
+
+
         $("#attachInfo").on("click", function () {
             $("#uploadAttachModal").modal("show");
         });
