@@ -156,7 +156,7 @@
     $(function () {
         //获取目录节点
         $.ajax({
-            url: "${ctx}/doc/catalog/${book.bookId}",
+            url: "${ctx}/doc/common/catalog/${book.bookId}",
             type: "GET",
             beforeSend: function (xhr) {
                 NProgress.start();

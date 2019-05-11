@@ -61,7 +61,7 @@ public class SearchController {
             Book book = bookService.findBookByIdentify(bookIdentify);
             Assert.notNull(book, "项目不存在");
             DocumentExample example = new DocumentExample();
-            //TODO
+            //TODO 加入lucene的搜索
             example.createCriteria().andBookIdEqualTo(book.getBookId())
                     .andDocumentNameLike("%" + keyword.trim() + "%");
 

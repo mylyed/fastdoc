@@ -47,7 +47,7 @@ public class Book implements Serializable {
      *
      * @mbg.generated Fri May 10 23:30:51 CST 2019
      */
-    private Integer autoRelease;
+    private Boolean autoRelease;
 
     /**
      *
@@ -368,7 +368,7 @@ public class Book implements Serializable {
      *
      * @mbg.generated Fri May 10 23:30:51 CST 2019
      */
-    public Integer getAutoRelease() {
+    public Boolean getAutoRelease() {
         return autoRelease;
     }
 
@@ -380,7 +380,7 @@ public class Book implements Serializable {
      *
      * @mbg.generated Fri May 10 23:30:51 CST 2019
      */
-    public void setAutoRelease(Integer autoRelease) {
+    public void setAutoRelease(Boolean autoRelease) {
         this.autoRelease = autoRelease;
     }
 

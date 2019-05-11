@@ -25,3 +25,7 @@
 /.nb-gradle/
 logs/
 **.DS_Store
+
+
+###
+/upload

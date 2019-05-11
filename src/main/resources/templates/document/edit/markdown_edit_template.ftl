@@ -11,25 +11,26 @@
 
         window.katex = {js: "${ctx}/static/katex/katex", css: "${ctx}/static/katex/katex"};
         window.editormdLib = "${ctx}/static/editor.md/lib/";
-
+        //基础信息
+        window.book = {identify: "${book.identify}"};
         /**
          * 读取文档的Markdown信息地址
          */
-        window.docMarkdownURL = "${ctx}/doc/markdown/";
+        window.docMarkdownURL = "${ctx}/doc/edit_mode/markdown/";
         /**
          * 新增，修改 删除文档地址
          */
-        window.docCUDURL = "${ctx}/doc/edit";
+        window.docCUDURL = "${ctx}/doc/edit_mode";
 
-        //配置
-        window.book = {identify: "${book.identify}"};
 
-        /**
-         * 文档排序
-         * @type {string}
-         */
-        window.docSortURL = "${ctx}/doc/sort";
+        //文档排序保存
+        window.docSortURL = "${ctx}/doc/edit_mode/sort";
 
+        // 高亮风格
+        window.highlightStyle = null;
+
+        window.imageUploadURL = "${ctx}/upload/image";
+        window.fileUploadURL = window.imageUploadURL;
 
     </script>
     <!-- Bootstrap -->
@@ -299,80 +300,80 @@
 <#--    </div>-->
 <#--</div>-->
 <#--<!-- 显示文档历史 &ndash;&gt;-->
-<#--<div class="modal fade" id="documentHistoryModal" tabindex="-1" role="dialog"-->
-<#--     aria-labelledby="documentHistoryModalModalLabel">-->
-<#--    <div class="modal-dialog" role="document">-->
-<#--        <div class="modal-content">-->
-<#--            <div class="modal-header">-->
-<#--                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
-<#--                </button>-->
-<#--                <h4 class="modal-title">文档历史记录</h4>-->
-<#--            </div>-->
-<#--            <div class="modal-body text-center" id="historyList">-->
+<div class="modal fade" id="documentHistoryModal" tabindex="-1" role="dialog"
+     aria-labelledby="documentHistoryModalModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">文档历史记录</h4>
+            </div>
+            <div class="modal-body text-center" id="historyList">
 
-<#--            </div>-->
-<#--            <div class="modal-footer">-->
-<#--                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>-->
-<#--            </div>-->
-<#--        </div>-->
-<#--    </div>-->
-<#--</div>-->
-<#--<!--- 选择模板-&ndash;&gt;-->
-<#--<div class="modal fade" id="documentTemplateModal" tabindex="-1" role="dialog" aria-labelledby="请选择模板类型"-->
-<#--     aria-hidden="true">-->
-<#--    <div class="modal-dialog" style="width: 780px;">-->
-<#--        <div class="modal-content">-->
-<#--            <div class="modal-header">-->
-<#--                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>-->
-<#--                </button>-->
-<#--                <h4 class="modal-title" id="modal-title">请选择模板类型</h4>-->
-<#--            </div>-->
-<#--            <div class="modal-body template-list">-->
-<#--                <div class="container">-->
-<#--                    <div class="section">-->
-<#--                        <a data-type="normal" href="javascript:;"><i class="fa fa-file-o"></i></a>-->
-<#--                        <h3><a data-type="normal" href="javascript:;">普通文档</a></h3>-->
-<#--                        <ul>-->
-<#--                            <li>默认类型</li>-->
-<#--                            <li>简单的文本文档</li>-->
-<#--                        </ul>-->
-<#--                    </div>-->
-<#--                    <div class="section">-->
-<#--                        <a data-type="api" href="javascript:;"><i class="fa fa-file-code-o"></i></a>-->
-<#--                        <h3><a data-type="api" href="javascript:;">API文档</a></h3>-->
-<#--                        <ul>-->
-<#--                            <li>用于API文档速写</li>-->
-<#--                            <li>支持代码高亮</li>-->
-<#--                        </ul>-->
-<#--                    </div>-->
-<#--                    <div class="section">-->
-<#--                        <a data-type="code" href="javascript:;"><i class="fa fa-book"></i></a>-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--- 选择模板--->
+<div class="modal fade" id="documentTemplateModal" tabindex="-1" role="dialog" aria-labelledby="请选择模板类型"
+     aria-hidden="true">
+    <div class="modal-dialog" style="width: 780px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="modal-title">请选择模板类型</h4>
+            </div>
+            <div class="modal-body template-list">
+                <div class="container">
+                    <div class="section">
+                        <a data-type="normal" href="javascript:;"><i class="fa fa-file-o"></i></a>
+                        <h3><a data-type="normal" href="javascript:;">普通文档</a></h3>
+                        <ul>
+                            <li>默认类型</li>
+                            <li>简单的文本文档</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <a data-type="api" href="javascript:;"><i class="fa fa-file-code-o"></i></a>
+                        <h3><a data-type="api" href="javascript:;">API文档</a></h3>
+                        <ul>
+                            <li>用于API文档速写</li>
+                            <li>支持代码高亮</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <a data-type="code" href="javascript:;"><i class="fa fa-book"></i></a>
 
-<#--                        <h3><a data-type="code" href="javascript:;">数据字典</a></h3>-->
-<#--                        <ul>-->
-<#--                            <li>用于数据字典显示</li>-->
-<#--                            <li>表格支持</li>-->
-<#--                        </ul>-->
-<#--                    </div>-->
-<#--                    <div class="section">-->
-<#--                        <a data-type="customs" href="javascript:;"><i class="fa fa-briefcase"></i></a>-->
+                        <h3><a data-type="code" href="javascript:;">数据字典</a></h3>
+                        <ul>
+                            <li>用于数据字典显示</li>
+                            <li>表格支持</li>
+                        </ul>
+                    </div>
+                    <div class="section">
+                        <a data-type="customs" href="javascript:;"><i class="fa fa-briefcase"></i></a>
 
-<#--                        <h3><a data-type="customs" href="javascript:;">自定义模板</a></h3>-->
-<#--                        <ul>-->
-<#--                            <li>自定义模板</li>-->
-<#--                            <li>支持任意类型文档</li>-->
-<#--                            <li>可以设置为全局模板</li>-->
-<#--                        </ul>-->
-<#--                    </div>-->
-<#--                </div>-->
+                        <h3><a data-type="customs" href="javascript:;">自定义模板</a></h3>
+                        <ul>
+                            <li>自定义模板</li>
+                            <li>支持任意类型文档</li>
+                            <li>可以设置为全局模板</li>
+                        </ul>
+                    </div>
+                </div>
 
-<#--            </div>-->
-<#--            <div class="modal-footer">-->
-<#--                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>-->
-<#--            </div>-->
-<#--        </div>-->
-<#--    </div>-->
-<#--</div>-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
 <#--<!--- 显示自定义模板-&ndash;&gt;-->
 <#--<div class="modal fade" id="displayCustomsTemplateModal" tabindex="-1" role="dialog"-->
 <#--     aria-labelledby="displayCustomsTemplateModalLabel">-->
@@ -458,32 +459,33 @@
 <#--        </div>-->
 <#--    </div>-->
 <#--</div>-->
-<#--<!--- json转换为表格 &ndash;&gt;-->
-<#--<div class="modal fade" id="convertJsonToTableModal" tabindex="-1" role="dialog"-->
-<#--     aria-labelledby="convertJsonToTableModalLabel">-->
-<#--    <div class="modal-dialog" role="document">-->
-<#--        <div class="modal-content">-->
-<#--            <form method="post" id="convertJsonToTableForm" class="form-horizontal">-->
-<#--                <div class="modal-header">-->
-<#--                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span-->
-<#--                                aria-hidden="true">&times;</span></button>-->
-<#--                    <h4 class="modal-title">Json转换为表格</h4>-->
-<#--                </div>-->
-<#--                <div class="modal-body text-center">-->
-<#--                    <textarea type="text" name="jsonContent" id="jsonContent" placeholder="Json" class="form-control"-->
-<#--                              style="height: 300px;resize: none"></textarea>-->
 
-<#--                </div>-->
-<#--                <div class="modal-footer">-->
-<#--                    <span id="json-error-message"></span>-->
-<#--                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>-->
-<#--                    <button type="button" class="btn btn-primary" id="btnInsertTable" data-loading-text="保存中...">插入-->
-<#--                    </button>-->
-<#--                </div>-->
-<#--            </form>-->
-<#--        </div>-->
-<#--    </div>-->
-<#--</div>-->
+<!--- json转换为表格 -->
+<div class="modal fade" id="convertJsonToTableModal" tabindex="-1" role="dialog"
+     aria-labelledby="convertJsonToTableModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" id="convertJsonToTableForm" class="form-horizontal">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Json转换为表格</h4>
+                </div>
+                <div class="modal-body text-center">
+                    <textarea type="text" name="jsonContent" id="jsonContent" placeholder="Json" class="form-control"
+                              style="height: 300px;resize: none"></textarea>
+
+                </div>
+                <div class="modal-footer">
+                    <span id="json-error-message"></span>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="btnInsertTable" data-loading-text="保存中...">插入
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <#--模板-->
 <template id="template-normal">
@@ -513,7 +515,7 @@
         var index = null;
         console.log("加载目录")
         $.ajax({
-            url: "${ctx}/doc/catalog/${book.bookId}",
+            url: "${ctx}/doc/common/catalog/${book.bookId}",
             type: "GET",
             beforeSend: function (xhr) {
                 index = layer.load(1, {shade: [0.1, '#fff']});
@@ -552,6 +554,7 @@
         });
 
 
+        //文件上传
         $("#attachInfo").on("click", function () {
             $("#uploadAttachModal").modal("show");
         });
@@ -564,7 +567,7 @@
                         auto: true,
                         dnd: true,
                         swf: '${ctx}/static/webuploader/Uploader.swf',
-                        server: '${ctx}/docs/upload',
+                        server: window.fileUploadURL,
                         formData: {"bookId": "${book.bookId}", "doc_id": window.selectNode.id},
                         pick: "#filePicker",
                         fileVal: "editormd-file-file",

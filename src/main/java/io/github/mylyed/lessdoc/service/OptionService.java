@@ -19,7 +19,6 @@ import java.util.Map;
 @Service
 public class OptionService {
 
-
     Logger log = LoggerFactory.getLogger(OptionService.class);
 
     @Resource
@@ -38,18 +37,21 @@ public class OptionService {
         return map;
     }
 
+
+    public Option findByOptName(String name) {
+        OptionExample optionExample = new OptionExample();
+        optionExample.createCriteria().andOptionNameEqualTo(name);
+        Option option = optionMapper.selectOneByExampleWithBLOBs(optionExample);
+
+        return option;
+    }
+
     /**
      * 是否启用验证码
      *
      * @return
      */
     public boolean enabledCaptcha() {
-
-        OptionExample optionExample = new OptionExample();
-        optionExample.createCriteria().andOptionNameEqualTo("ENABLED_CAPTCHA");
-
-        Option option = optionMapper.selectOneByExampleWithBLOBs(optionExample);
-
-        return Boolean.valueOf(option.getOptionValue());
+        return Boolean.valueOf(findByOptName("ENABLED_CAPTCHA").getOptionValue());
     }
 }

@@ -1,17 +1,21 @@
 package io.github.mylyed.lessdoc.service;
 
 import io.github.mylyed.lessdoc.exception.DocumentVersionException;
+import io.github.mylyed.lessdoc.persist.entity.Book;
 import io.github.mylyed.lessdoc.persist.entity.Document;
 import io.github.mylyed.lessdoc.persist.entity.DocumentExample;
+import io.github.mylyed.lessdoc.persist.entity.Member;
+import io.github.mylyed.lessdoc.persist.mapper.BookMapper;
 import io.github.mylyed.lessdoc.persist.mapper.DocumentMapper;
+import io.github.mylyed.lessdoc.persist.mapper.MemberMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.IntStream;
 
 /**
  * @author lilei
@@ -21,6 +25,36 @@ import java.util.stream.IntStream;
 public class DocumentService {
     @Resource
     DocumentMapper documentMapper;
+
+
+    @Resource
+    BookMapper bookMapper;
+
+
+    @Resource
+    MemberMapper memberMapper;
+
+
+    /**
+     * 处理了Release信息
+     *
+     * @param document
+     */
+    private void processor(Document document) {
+        String release = document.getRelease();
+
+        String data = DateFormatUtils.format(document.getModifyTime(), "yyyy-MM-dd HH:mm:ss");
+        Member member = memberMapper.selectByPrimaryKey(document.getMemberId());
+        String autor;
+        if (member != null) {
+            autor = Optional.ofNullable(member.getRealName()).orElse(member.getAccount());
+        } else {
+            autor = "佚名";
+        }
+
+        release += "<div class=\"wiki-bottom\">文档更新时间: " + data + "     作者：" + autor + "</div></article>";
+        document.setRelease(release);
+    }
 
 
     public Document findDocById(Integer docId) {
@@ -48,7 +82,7 @@ public class DocumentService {
     static final List<String> DOCUMENT_IDENTIFY_KEYWORD = Arrays.asList("", "");
 
     /**
-     * 新增
+     * 新增 目录
      *
      * @param document
      */
@@ -68,9 +102,9 @@ public class DocumentService {
         documentExample.createCriteria().andBookIdEqualTo(document.getBookId())
                 .andParentIdEqualTo(document.getParentId());
         //
-        int order = documentMapper.selectByExample(documentExample).stream().flatMapToInt(p -> IntStream.of(p.getOrderSort())).max().orElse(0);
+        int count = Long.valueOf(documentMapper.countByExample(documentExample)).intValue();
 
-        document.setOrderSort(order + 1);
+        document.setOrderSort(count);
         document.setIsOpen(Optional.ofNullable(document.getIsOpen()).orElse(true));
         String version = DigestUtils.md5Hex(document.getDocumentName());
         document.setVersion(version);
@@ -87,8 +121,8 @@ public class DocumentService {
             documentExample.createCriteria().andBookIdEqualTo(document.getBookId())
                     .andIdentifyEqualTo(document.getIdentify());
 
-            long count = documentMapper.countByExample(documentExample);
-            Assert.isTrue(count == 0, "文档标识重复");
+            long i = documentMapper.countByExample(documentExample);
+            Assert.isTrue(i == 0, "文档标识重复");
 
         }
         //新增
@@ -124,6 +158,15 @@ public class DocumentService {
         document.setModifyTime(new Date());
         document.setVersion(version);
         document.setModifyAt(exist.getModifyAt() + 1);
+        document.setMemberId(exist.getMemberId());
+        Book book = bookMapper.selectByPrimaryKey(exist.getBookId());
+        if (book.getAutoRelease()) {
+            //文档自动发布
+            document.setRelease(document.getContent());
+            processor(document);
+        }
+
+
         int i = documentMapper.updateByPrimaryKeySelective(document);
         Assert.isTrue(i == 1, "修改失败");
         //日志
@@ -159,7 +202,12 @@ public class DocumentService {
             if (document.getParentId() == null) {
                 continue;
             }
-            documentMapper.updateByPrimaryKeySelective(document);
+            final Document update = new Document();
+            //只修改两属性
+            update.setDocumentId(document.getDocumentId());
+            update.setParentId(document.getParentId());
+            update.setParentId(document.getParentId());
+            documentMapper.updateByPrimaryKeySelective(update);
 
         }
     }

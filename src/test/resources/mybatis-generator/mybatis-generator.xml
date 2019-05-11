@@ -87,6 +87,9 @@
             <columnOverride column="is_use_first_document" jdbcType="INTEGER" property="useFirstDocument"
                             javaType="java.lang.Boolean"/>
 
+            <columnOverride column="auto_release" jdbcType="INTEGER" property="autoRelease"
+                            javaType="java.lang.Boolean"/>
+
         </table>
 
         <table tableName="md_document_history" domainObjectName="DocumentHistory" enableCountByExample="true"

@@ -13,6 +13,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 文档编辑
@@ -22,7 +23,7 @@ import javax.annotation.Resource;
  */
 
 @Controller
-@RequestMapping("doc/edit")
+@RequestMapping("doc/edit_mode")
 public class DocumentEditController {
     Logger log = LoggerFactory.getLogger(DocumentEditController.class);
 
@@ -74,7 +75,43 @@ public class DocumentEditController {
         log.debug("document={}", document);
         documentService.deleteDoc(document);
         JsonResponse response = new JsonResponse();
+        response.setData(document);
         return response;
+    }
+
+
+    /**
+     * 获取文档的markdown原始信息
+     *
+     * @param docId
+     * @return
+     */
+    @GetMapping("/markdown/{docId}")
+    @ResponseBody
+    public JsonResponse getMarkdownRaw(@PathVariable("docId") Integer docId) {
+        Document document = documentService.findDocById(docId);
+        Assert.notNull(document, "文档不存在");
+        JsonResponse jsonResponse = new JsonResponse();
+        document.setRelease(null);
+        document.setContent(null);
+        jsonResponse.setData(document);
+        return jsonResponse;
+    }
+
+
+    /**
+     * 文档排序
+     *
+     * @param documents 文档的排序信息
+     * @return
+     */
+    @PostMapping("/sort")
+    @ResponseBody
+    public JsonResponse docSort(@RequestBody List<Document> documents) {
+
+        documentService.saveDocSort(documents);
+
+        return new JsonResponse();
     }
 
 }

@@ -1,16 +1,27 @@
 package io.github.mylyed.lessdoc.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * @author lilei
  * created at 2019/4/30
  */
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class JsonResponse {
 
-    private Integer errcode = 0;
+    private Integer errcode;
     private String message = "ok";
     private Object data;
 
-    public JsonResponse() {
+    public Integer getErrcode() {
+        return errcode == null ? 0 : errcode;
     }
 
     public JsonResponse(Integer errcode, String message) {
@@ -18,32 +29,4 @@ public class JsonResponse {
         this.message = message;
     }
 
-    public JsonResponse(String message) {
-        this.message = message;
-    }
-
-
-    public Integer getErrcode() {
-        return errcode;
-    }
-
-    public void setErrcode(Integer errcode) {
-        this.errcode = errcode;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
-    }
 }
