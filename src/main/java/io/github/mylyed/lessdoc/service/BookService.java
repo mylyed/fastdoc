@@ -20,7 +20,6 @@ public class BookService {
     public Book findBookByIdentify(String identify) {
         BookExample bookExample = new BookExample();
         bookExample.createCriteria().andIdentifyEqualTo(identify);
-
         return bookMapper.selectOneByExample(bookExample);
     }
 }

@@ -98,6 +98,7 @@
                enableSelectByExample="true"
                selectByExampleQueryId="true">
             <columnRenamingRule searchString="^D_" replaceString=""/>
+            <columnOverride column="is_open" jdbcType="INTEGER" property="isOpen" javaType="java.lang.Boolean"/>
         </table>
 
 

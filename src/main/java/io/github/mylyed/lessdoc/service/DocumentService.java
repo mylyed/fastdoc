@@ -1,11 +1,9 @@
 package io.github.mylyed.lessdoc.service;
 
 import io.github.mylyed.lessdoc.exception.DocumentVersionException;
-import io.github.mylyed.lessdoc.persist.entity.Book;
-import io.github.mylyed.lessdoc.persist.entity.Document;
-import io.github.mylyed.lessdoc.persist.entity.DocumentExample;
-import io.github.mylyed.lessdoc.persist.entity.Member;
+import io.github.mylyed.lessdoc.persist.entity.*;
 import io.github.mylyed.lessdoc.persist.mapper.BookMapper;
+import io.github.mylyed.lessdoc.persist.mapper.DocumentHistoryMapper;
 import io.github.mylyed.lessdoc.persist.mapper.DocumentMapper;
 import io.github.mylyed.lessdoc.persist.mapper.MemberMapper;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -34,6 +32,8 @@ public class DocumentService {
     @Resource
     MemberMapper memberMapper;
 
+    @Resource
+    DocumentHistoryMapper documentHistoryMapper;
 
     /**
      * 处理了Release信息
@@ -157,7 +157,8 @@ public class DocumentService {
         //修改
         document.setModifyTime(new Date());
         document.setVersion(version);
-        document.setModifyAt(exist.getModifyAt() + 1);
+        //最后修改人 todo
+        document.setModifyAt(null);
         document.setMemberId(exist.getMemberId());
         Book book = bookMapper.selectByPrimaryKey(exist.getBookId());
         if (book.getAutoRelease()) {
@@ -166,10 +167,27 @@ public class DocumentService {
             processor(document);
         }
 
+        //记录历史
+        DocumentHistory documentHistory = new DocumentHistory();
+        documentHistory.setContent(document.getContent());
+        documentHistory.setMarkdown(document.getMarkdown());
+        documentHistory.setIsOpen(document.getIsOpen());
+
+        documentHistory.setDocumentId(document.getDocumentId());
+        documentHistory.setDocumentName(document.getDocumentName());
+        documentHistory.setParentId(document.getParentId());
+        documentHistory.setVersion(document.getVersion());
+
+        documentHistory.setModifyTime(document.getModifyTime());
+        documentHistory.setModifyAt(document.getModifyAt());
+
+        //当前修改人
+        documentHistory.setMemberId(document.getMemberId());
 
         int i = documentMapper.updateByPrimaryKeySelective(document);
         Assert.isTrue(i == 1, "修改失败");
         //日志
+        documentHistoryMapper.insertSelective(documentHistory);
     }
 
 

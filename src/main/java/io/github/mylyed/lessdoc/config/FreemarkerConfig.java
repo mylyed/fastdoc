@@ -1,6 +1,7 @@
 package io.github.mylyed.lessdoc.config;
 
 import freemarker.template.TemplateModelException;
+import io.github.mylyed.lessdoc.ext.freemarker.MemberNameMethod;
 import io.github.mylyed.lessdoc.service.OptionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +31,17 @@ public class FreemarkerConfig {
     @Resource
     private OptionService optionService;
 
+
+    @Resource
+    MemberNameMethod memberNameMethod;
+
+
     @PostConstruct
     public void setConfigure() throws TemplateModelException {
+        configuration.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");
+        configuration.setDateFormat("yyyy-MM-dd HH:mm:ss");
+        configuration.setTimeFormat("HH:mm:ss");
+
         configuration.setSharedVariable("LOGO", "LessDoc");
         configuration.setSharedVariable("HOME_PAGE", "http://mylyed.github.io");
 
@@ -42,6 +52,9 @@ public class FreemarkerConfig {
                 e.printStackTrace();
             }
         });
+
+
+        configuration.setSharedVariable("name", memberNameMethod);
     }
 
 }

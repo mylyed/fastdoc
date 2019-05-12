@@ -307,6 +307,7 @@ function showSuccess($msg, $id) {
     return true;
 }
 
+
 window.documentHistory = function () {
     layer.open({
         type: 2,

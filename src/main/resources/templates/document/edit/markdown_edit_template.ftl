@@ -31,6 +31,8 @@
 
         window.imageUploadURL = "${ctx}/upload/image";
         window.fileUploadURL = window.imageUploadURL;
+        //获取文档历史
+        window.historyURL = "${ctx}/doc_history";
 
     </script>
     <!-- Bootstrap -->

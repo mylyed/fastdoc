@@ -73,6 +73,7 @@ $(function () {
      */
     $("#editormd-tools").on("click", "a[class!='disabled']", function () {
         var name = $(this).find("i").attr("name");
+        console.log("嗲及标题栏", name)
         if (name === "attachment") {
             $("#uploadAttachModal").modal("show");
         } else if (name === "history") {

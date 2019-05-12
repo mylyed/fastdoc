@@ -107,11 +107,12 @@ public class DocumentEditController {
      */
     @PostMapping("/sort")
     @ResponseBody
-    public JsonResponse docSort(@RequestBody List<Document> documents) {
-
+    public JsonResponse saveDocSort(@RequestBody List<Document> documents) {
         documentService.saveDocSort(documents);
-
         return new JsonResponse();
     }
+
+
+
 
 }

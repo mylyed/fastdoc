@@ -17,11 +17,15 @@ import lombok.NoArgsConstructor;
 public class JsonResponse {
 
     private Integer errcode;
-    private String message = "ok";
+    private String message;
     private Object data;
 
     public Integer getErrcode() {
         return errcode == null ? 0 : errcode;
+    }
+
+    public String getMessage() {
+        return message == null ? "ok" : message;
     }
 
     public JsonResponse(Integer errcode, String message) {
