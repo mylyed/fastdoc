@@ -15,6 +15,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
+/**
+ * 翻译会员名字
+ */
 @Component
 @Slf4j
 public class MemberNameMethod implements TemplateMethodModelEx {

@@ -1,5 +1,6 @@
 package io.github.mylyed.lessdoc.controllers;
 
+import io.github.mylyed.lessdoc.ext.permissions.RequiresUser;
 import io.github.mylyed.lessdoc.response.EditormdResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -23,7 +24,6 @@ import java.util.UUID;
 @Slf4j
 public class UploadController {
 
-
     /**
      * 图片上传
      *
@@ -31,6 +31,7 @@ public class UploadController {
      * @return
      */
     @PostMapping("/upload/image")
+    @RequiresUser
     public EditormdResponse upload(@RequestParam(value = "editormd-image-file", required = false) MultipartFile file) {
 
         if (file == null || file.isEmpty()) {

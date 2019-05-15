@@ -1,5 +1,7 @@
 package io.github.mylyed.lessdoc.common;
 
+import java.nio.charset.Charset;
+
 /**
  * @author lilei
  * created at 2019/5/1
@@ -10,6 +12,10 @@ public interface Const {
     interface SessionKey {
         String CAPTCHA = "captcha";
         String ACCOUNT = "member";
+    }
+
+    interface Charsets {
+        Charset UTF_8 = Charset.forName("utf-8");
     }
 
 

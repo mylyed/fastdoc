@@ -1,6 +1,8 @@
 package io.github.mylyed.lessdoc.controllers;
 
 import io.github.mylyed.lessdoc.common.Const;
+import io.github.mylyed.lessdoc.common.EditDocType;
+import io.github.mylyed.lessdoc.ext.permissions.RequiresUser;
 import io.github.mylyed.lessdoc.persist.entity.Book;
 import io.github.mylyed.lessdoc.persist.entity.Document;
 import io.github.mylyed.lessdoc.persist.entity.DocumentHistory;
@@ -18,7 +20,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,6 +32,7 @@ import java.util.Objects;
 @Slf4j
 @Controller
 @RequestMapping("doc_history")
+@RequiresUser
 public class DocHistoryController {
 
     @Resource
@@ -126,20 +128,17 @@ public class DocHistoryController {
      * @param historyId
      * @return
      */
-    @PostMapping
+    @PostMapping("restore")
     @ResponseBody
     public JsonResponse restoreHistory(@RequestParam("identify") String bookIdentify, @RequestParam("history_id") Integer historyId) {
         getAndCheckBook(bookIdentify, historyId);
-
 
         DocumentHistory documentHistory = documentHistoryMapper.selectByPrimaryKey(historyId);
         Document document = documentService.findDocById(documentHistory.getDocumentId());
 
         document.setMarkdown(documentHistory.getMarkdown());
         document.setContent(documentHistory.getContent());
-        document.setModifyTime(new Date());
-
-        //TODO 构造修改文档的枚举
+        documentService.editDoc(document, EditDocType.RESTORE);
 
         return JsonResponse.builder().build();
     }

@@ -1,5 +1,7 @@
 package io.github.mylyed.lessdoc.service;
 
+import io.github.mylyed.lessdoc.common.EditDocType;
+import io.github.mylyed.lessdoc.common.TokenHolder;
 import io.github.mylyed.lessdoc.exception.DocumentVersionException;
 import io.github.mylyed.lessdoc.persist.entity.*;
 import io.github.mylyed.lessdoc.persist.mapper.BookMapper;
@@ -72,14 +74,14 @@ public class DocumentService {
      */
     public void saveOrUpdate(Document document, boolean cover) {
         if (document.getDocumentId() != null && document.getDocumentId() != 0) {
-            update(document, cover);
+            editDoc(document, cover ? EditDocType.COVER : EditDocType.UPDATE);
         } else {
             save(document);
         }
     }
 
     //文档标识 保留字段
-    static final List<String> DOCUMENT_IDENTIFY_KEYWORD = Arrays.asList("", "");
+    static final List<String> DOCUMENT_IDENTIFY_KEYWORD = Arrays.asList("");
 
     /**
      * 新增 目录
@@ -89,15 +91,20 @@ public class DocumentService {
     private void save(Document document) {
         Assert.hasText(document.getDocumentName(), "文档名称未填写");
         Assert.notNull(document.getBookId(), "bookId参数是空");
+        Member member = TokenHolder.loginedMember();
+
+
         //新增
         //清理下主键
         document.setDocumentId(null);
+        document.setMemberId(member.getMemberId());
         document.setCreateTime(new Date());
+
         document.setModifyTime(new Date());
-        document.setModifyAt(0);
+        document.setModifyAt(member.getMemberId());
         document.setParentId(Optional.ofNullable(document.getParentId()).orElse(0));
 
-        //找到最大的序号
+        //排序
         DocumentExample documentExample = new DocumentExample();
         documentExample.createCriteria().andBookIdEqualTo(document.getBookId())
                 .andParentIdEqualTo(document.getParentId());
@@ -109,11 +116,12 @@ public class DocumentService {
         String version = DigestUtils.md5Hex(document.getDocumentName());
         document.setVersion(version);
 
-        //todo 当前登录人
+
         if (StringUtils.isEmpty(document.getIdentify())) {
             //用户没有自定义
             document.setIdentify(UUID.randomUUID().toString());
         } else {
+            //用户自定义文档标识
             if (DOCUMENT_IDENTIFY_KEYWORD.contains(document.getIdentify())) {
                 throw new IllegalArgumentException("不能使用文档标识" + document.getIdentify());
             }
@@ -128,10 +136,10 @@ public class DocumentService {
         //新增
         documentMapper.insertSelective(document);
 
+        //回填ID
         documentExample = new DocumentExample();
         documentExample.createCriteria().andBookIdEqualTo(document.getBookId())
                 .andIdentifyEqualTo(document.getIdentify());
-
         Document docSaveEd = documentMapper.selectOneByExample(documentExample);
         document.setDocumentId(docSaveEd.getDocumentId());
     }
@@ -140,13 +148,14 @@ public class DocumentService {
      * 修改
      *
      * @param document
-     * @param cover    是否覆盖
+     * @param editDocType 文档修改类型
      */
-    private void update(Document document, boolean cover) {
+    public void editDoc(Document document, EditDocType editDocType) {
         Assert.notNull(document.getDocumentId(), "文档ID为空");
         Document exist = documentMapper.selectByPrimaryKey(document.getDocumentId());
         Assert.notNull(exist, "要修的文档不存在");
-        if (!cover && StringUtils.isNotEmpty(document.getVersion())) {
+
+        if (!editDocType.cover && StringUtils.isNotEmpty(document.getVersion())) {
             String v1 = exist.getVersion();
             String v2 = document.getVersion();
             if (!Objects.equals(v1, v2)) {
@@ -157,8 +166,10 @@ public class DocumentService {
         //修改
         document.setModifyTime(new Date());
         document.setVersion(version);
-        //最后修改人 todo
-        document.setModifyAt(null);
+
+        Member member = TokenHolder.loginedMember();
+        //最后修改人
+        document.setModifyAt(member.getMemberId());
         document.setMemberId(exist.getMemberId());
         Book book = bookMapper.selectByPrimaryKey(exist.getBookId());
         if (book.getAutoRelease()) {
@@ -169,6 +180,8 @@ public class DocumentService {
 
         //记录历史
         DocumentHistory documentHistory = new DocumentHistory();
+        documentHistory.setAction(editDocType.action);
+        documentHistory.setActionName(editDocType.actionName);
         documentHistory.setContent(document.getContent());
         documentHistory.setMarkdown(document.getMarkdown());
         documentHistory.setIsOpen(document.getIsOpen());
@@ -179,13 +192,13 @@ public class DocumentService {
         documentHistory.setVersion(document.getVersion());
 
         documentHistory.setModifyTime(document.getModifyTime());
-        documentHistory.setModifyAt(document.getModifyAt());
+        documentHistory.setModifyAt(member.getMemberId());
 
         //当前修改人
-        documentHistory.setMemberId(document.getMemberId());
+        documentHistory.setMemberId(member.getMemberId());
 
         int i = documentMapper.updateByPrimaryKeySelective(document);
-        Assert.isTrue(i == 1, "修改失败");
+        Assert.isTrue(i == 1, editDocType.actionName + "失败");
         //日志
         documentHistoryMapper.insertSelective(documentHistory);
     }
@@ -200,8 +213,10 @@ public class DocumentService {
         Assert.notNull(document.getDocumentId(), "文档ID为空");
         int i = documentMapper.deleteByPrimaryKey(document.getDocumentId());
         Assert.isTrue(i == 1, "删除失败");
-
-        //TODO 还要删除相关日志和历史文档
+        //情况历史记录
+        DocumentHistoryExample documentHistoryExample = new DocumentHistoryExample();
+        documentHistoryExample.createCriteria().andDocumentIdEqualTo(document.getDocumentId());
+        documentHistoryMapper.deleteByExample(documentHistoryExample);
     }
 
     /**

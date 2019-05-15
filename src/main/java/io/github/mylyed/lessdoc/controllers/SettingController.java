@@ -1,5 +1,6 @@
 package io.github.mylyed.lessdoc.controllers;
 
+import io.github.mylyed.lessdoc.ext.permissions.RequiresUser;
 import io.github.mylyed.lessdoc.response.JsonResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.Assert;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("/setting")
+@RequiresUser
 public class SettingController {
 
     @GetMapping({"", "/", "/index"})

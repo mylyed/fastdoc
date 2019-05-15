@@ -108,37 +108,36 @@
                 })
             }
         });
-        //
-        //     $(".restore-btn").on("click",function () {
-        //         var id = $(this).attr('data-id');
-        //         var $btn = $(this).button('loading');
-        //         var $then = $(this);
-        //         var index = parent.layer.getFrameIndex(window.name);
-        //
-        //         if(!id){
-        //             layer.msg('参数错误');
-        //         }else{
-        //             $.ajax({
-        //                 url : "{{urlfor "DocumentController.RestoreHistory"}}",
-        //                 type : "post",
-        //                 dataType : "json",
-        //                 data : { "identify" : "{{.Model.Identify}}","doc_id" : "{{.Document.DocumentId}}" ,"history_id" : id },
-        //                 success :function (res) {
-        //                     if(res.errcode === 0){
-        //                         var $node = { "node" : { "id" : res.data.doc_id}};
-        //
-        //                         parent.loadDocument($node);
-        //                         parent.layer.close(index);
-        //                     }else{
-        //                         layer.msg(res.message);
-        //                     }
-        //                 },
-        //                 error : function () {
-        //                     $btn.button('reset');
-        //                 }
-        //             })
-        //         }
-        //     });
+
+        $(".restore-btn").on("click", function () {
+            var id = $(this).attr('data-id');
+            var $btn = $(this).button('loading');
+            var $then = $(this);
+            var index = parent.layer.getFrameIndex(window.name);
+
+            if (!id) {
+                layer.msg('参数错误');
+            } else {
+                $.ajax({
+                    url: "${ctx}/doc_history/restore",
+                    type: "post",
+                    dataType: "json",
+                    data: {"identify": "${book.identify}", "history_id": id},
+                    success: function (res) {
+                        if (res.errcode === 0) {
+                            var $node = {"node": {"id": res.data.doc_id}};
+                            parent.loadDocument($node);
+                            parent.layer.close(index);
+                        } else {
+                            layer.msg(res.message);
+                        }
+                    },
+                    error: function () {
+                        $btn.button('reset');
+                    }
+                })
+            }
+        });
         $(".compare-btn").on("click", function () {
             var historyId = $(this).attr("data-id");
             window.compareIndex = window.top.layer.open({

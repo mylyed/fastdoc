@@ -1,5 +1,6 @@
 package io.github.mylyed.lessdoc.controllers;
 
+import io.github.mylyed.lessdoc.ext.permissions.RequiresUser;
 import io.github.mylyed.lessdoc.persist.entity.Book;
 import io.github.mylyed.lessdoc.persist.entity.Document;
 import io.github.mylyed.lessdoc.response.JsonResponse;
@@ -24,6 +25,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("doc/edit_mode")
+@RequiresUser
 public class DocumentEditController {
     Logger log = LoggerFactory.getLogger(DocumentEditController.class);
 
@@ -111,8 +113,6 @@ public class DocumentEditController {
         documentService.saveDocSort(documents);
         return new JsonResponse();
     }
-
-
 
 
 }
