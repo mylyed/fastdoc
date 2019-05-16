@@ -14,6 +14,9 @@
         <version>2.1.4.RELEASE</version>
 
     </parent>
+    <properties>
+        <lucene.version>8.1.0</lucene.version>
+    </properties>
 
     <!-- Add typical dependencies for a web application -->
     <dependencies>
@@ -76,7 +79,23 @@
             <artifactId>guava</artifactId>
             <version>27.1-jre</version>
         </dependency>
+        <!--   lucene 相关     -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-smartcn</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
     </dependencies>
 
     <!-- Package as an executable jar -->

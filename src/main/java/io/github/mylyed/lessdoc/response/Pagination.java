@@ -1,12 +1,17 @@
 package io.github.mylyed.lessdoc.response;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
+
+import java.util.List;
 
 /**
  * @author lilei
  * created at 2019/5/1
  */
-public class Pagination {
+@Data
+public class Pagination<T> {
 
     /**
      * 总共的数据条数
@@ -34,6 +39,9 @@ public class Pagination {
      */
     private int number;
 
+
+    private List<T> data;
+
     /**
      * @param page          请求第几页
      * @param pageSize      每页多少条数据
@@ -57,63 +65,5 @@ public class Pagination {
         number = page;
     }
 
-    public long getTotalElements() {
-        return totalElements;
-    }
 
-    public void setTotalElements(long totalElements) {
-        this.totalElements = totalElements;
-    }
-
-    public int getTotalPages() {
-        return totalPages;
-    }
-
-    public void setTotalPages(int totalPages) {
-        this.totalPages = totalPages;
-    }
-
-    public Boolean getLast() {
-        return last;
-    }
-
-    public void setLast(Boolean last) {
-        this.last = last;
-    }
-
-    public Boolean getFirst() {
-        return first;
-    }
-
-    public void setFirst(Boolean first) {
-        this.first = first;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public void setNumber(int number) {
-        this.number = number;
-    }
-
-    @Override
-    public String toString() {
-        return "Pagination{" +
-                "totalElements=" + totalElements +
-                ", totalPages=" + totalPages +
-                ", last=" + last +
-                ", first=" + first +
-                ", size=" + size +
-                ", number=" + number +
-                '}';
-    }
 }

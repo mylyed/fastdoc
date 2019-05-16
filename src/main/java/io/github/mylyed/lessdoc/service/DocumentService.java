@@ -3,6 +3,7 @@ package io.github.mylyed.lessdoc.service;
 import io.github.mylyed.lessdoc.common.EditDocType;
 import io.github.mylyed.lessdoc.common.TokenHolder;
 import io.github.mylyed.lessdoc.exception.DocumentVersionException;
+import io.github.mylyed.lessdoc.model.DocumentEvent;
 import io.github.mylyed.lessdoc.persist.entity.*;
 import io.github.mylyed.lessdoc.persist.mapper.BookMapper;
 import io.github.mylyed.lessdoc.persist.mapper.DocumentHistoryMapper;
@@ -11,6 +12,8 @@ import io.github.mylyed.lessdoc.persist.mapper.MemberMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -36,6 +39,9 @@ public class DocumentService {
 
     @Resource
     DocumentHistoryMapper documentHistoryMapper;
+
+    @Autowired
+    ApplicationContext applicationContext;
 
     /**
      * 处理了Release信息
@@ -142,6 +148,8 @@ public class DocumentService {
                 .andIdentifyEqualTo(document.getIdentify());
         Document docSaveEd = documentMapper.selectOneByExample(documentExample);
         document.setDocumentId(docSaveEd.getDocumentId());
+        applicationContext.publishEvent(DocumentEvent.builder().eventType(DocumentEvent.EventType.CREATE).documentId(document.getDocumentId()).build());
+
     }
 
     /**
@@ -201,6 +209,9 @@ public class DocumentService {
         Assert.isTrue(i == 1, editDocType.actionName + "失败");
         //日志
         documentHistoryMapper.insertSelective(documentHistory);
+
+        applicationContext.publishEvent(DocumentEvent.builder().eventType(DocumentEvent.EventType.UPDATE).documentId(document.getDocumentId()).build());
+
     }
 
 
@@ -217,6 +228,7 @@ public class DocumentService {
         DocumentHistoryExample documentHistoryExample = new DocumentHistoryExample();
         documentHistoryExample.createCriteria().andDocumentIdEqualTo(document.getDocumentId());
         documentHistoryMapper.deleteByExample(documentHistoryExample);
+        applicationContext.publishEvent(DocumentEvent.builder().eventType(DocumentEvent.EventType.DELETE).documentId(document.getDocumentId()).build());
     }
 
     /**

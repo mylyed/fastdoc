@@ -8,7 +8,9 @@ import io.github.mylyed.lessdoc.persist.mapper.DocumentMapper;
 import io.github.mylyed.lessdoc.response.JsonResponse;
 import io.github.mylyed.lessdoc.response.Pagination;
 import io.github.mylyed.lessdoc.service.BookService;
+import io.github.mylyed.lessdoc.service.SearchService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.Assert;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,15 +31,24 @@ import java.util.Optional;
 @RequestMapping("search")
 public class SearchController {
 
+    @Autowired
+    SearchService searchService;
 
     @RequestMapping({"", "/", "/index"})
     public String index(Model model, String keyword, Integer page) {
         page = Optional.ofNullable(page).orElse(1);
-
         model.addAttribute("keyword", keyword);
         Pagination pagination = new Pagination(page, Const.PAGE_SIZE, 100L);
         model.addAttribute("pagination", pagination);
         return "search/index";
+    }
+
+
+    @RequestMapping("/init")
+    @ResponseBody
+    public JsonResponse init(boolean update) throws IOException {
+        searchService.initSearch(update);
+        return JsonResponse.builder().build();
     }
 
 
@@ -66,7 +78,7 @@ public class SearchController {
                     .andDocumentNameLike("%" + keyword.trim() + "%");
 
 
-            List<Document> documents = documentMapper.selectByExample(example);
+            List<Document> documents = searchService.search(keyword, book.getBookId());
             jsonResponse.setData(documents);
 
         }

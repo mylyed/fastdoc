@@ -13,7 +13,29 @@
             <div class="manual-list">
                 <#if lists?? && lists?size gt 0>
                     <#list lists as item>
-<#--                        //TODO-->
+                        <div class="list-item">
+                            <dl class="manual-item-standard">
+                                <dt>
+                                    <a href="${ctx}/doc/read/${item.identify}"
+                                       title="${item.bookName!}-${item.author!}" target="_blank">
+                                        <img src="${item.cover!}" class="cover"
+                                             alt="${item.bookName!}-${item.author!}"
+                                             onerror="this.src='${ctx}/static/images/book.jpg';">
+                                    </a>
+                                </dt>
+                                <dd>
+                                    <a href="${ctx}/doc/read/${item.identify}" class="name"
+                                       title="${item.bookName!}-${item.author!}" target="_blank">${item.bookName!}</a>
+                                </dd>
+                                <dd>
+                            <span class="author">
+                                <b class="text">作者</b>
+                                <b class="text">-</b>
+                                <b class="text">${item.author!}</b>
+                            </span>
+                                </dd>
+                            </dl>
+                        </div>
                     </#list>
                 <#else>
                     <div class="search-empty">
