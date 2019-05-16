@@ -141,15 +141,13 @@ public class DocumentService {
         }
         //新增
         documentMapper.insertSelective(document);
-
         //回填ID
         documentExample = new DocumentExample();
         documentExample.createCriteria().andBookIdEqualTo(document.getBookId())
                 .andIdentifyEqualTo(document.getIdentify());
         Document docSaveEd = documentMapper.selectOneByExample(documentExample);
         document.setDocumentId(docSaveEd.getDocumentId());
-        applicationContext.publishEvent(DocumentEvent.builder().eventType(DocumentEvent.EventType.CREATE).documentId(document.getDocumentId()).build());
-
+        applicationContext.publishEvent(DocumentEvent.builder().eventType(DocumentEvent.EventType.CREATE).document(document).build());
     }
 
     /**
@@ -210,7 +208,7 @@ public class DocumentService {
         //日志
         documentHistoryMapper.insertSelective(documentHistory);
 
-        applicationContext.publishEvent(DocumentEvent.builder().eventType(DocumentEvent.EventType.UPDATE).documentId(document.getDocumentId()).build());
+        applicationContext.publishEvent(DocumentEvent.builder().eventType(DocumentEvent.EventType.UPDATE).document(document).build());
 
     }
 
@@ -228,7 +226,7 @@ public class DocumentService {
         DocumentHistoryExample documentHistoryExample = new DocumentHistoryExample();
         documentHistoryExample.createCriteria().andDocumentIdEqualTo(document.getDocumentId());
         documentHistoryMapper.deleteByExample(documentHistoryExample);
-        applicationContext.publishEvent(DocumentEvent.builder().eventType(DocumentEvent.EventType.DELETE).documentId(document.getDocumentId()).build());
+        applicationContext.publishEvent(DocumentEvent.builder().eventType(DocumentEvent.EventType.DELETE).document(document).build());
     }
 
     /**

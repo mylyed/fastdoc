@@ -1,5 +1,6 @@
 package io.github.mylyed.lessdoc.model;
 
+import io.github.mylyed.lessdoc.persist.entity.Document;
 import lombok.Builder;
 import lombok.Data;
 
@@ -27,6 +28,6 @@ public class DocumentEvent {
     }
 
     EventType eventType;
-    Integer documentId;
+    Document document;
 
 }

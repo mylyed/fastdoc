@@ -7,15 +7,10 @@ import io.github.mylyed.lessdoc.persist.entity.DocumentExample;
 import io.github.mylyed.lessdoc.persist.mapper.DocumentMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
+import org.apache.lucene.document.*;
 import org.apache.lucene.index.*;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.util.BytesRef;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -41,6 +36,44 @@ public class SearchService {
     @Async
     public void handEvent(DocumentEvent documentEvent) {
         log.debug("收到事件：{}", documentEvent);
+        io.github.mylyed.lessdoc.persist.entity.Document document = documentEvent.getDocument();
+        switch (documentEvent.getEventType()) {
+            case CREATE:
+                create(document);
+                break;
+            case UPDATE:
+                delete(document);
+                create(document);
+                break;
+            case DELETE:
+                delete(document);
+                break;
+        }
+    }
+
+    private IndexWriter getIndexWriter() throws IOException {
+        IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+        //创建
+        iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+        IndexWriter writer = new IndexWriter(directory, iwc);
+        return writer;
+    }
+
+    public void create(io.github.mylyed.lessdoc.persist.entity.Document document) {
+        try (IndexWriter writer = getIndexWriter()) {
+            writer.addDocument(buildLuceneDocument(document));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete(io.github.mylyed.lessdoc.persist.entity.Document document) {
+        try (IndexWriter writer = getIndexWriter()) {
+            writer.deleteDocuments(IntPoint.newExactQuery("documentId", document.getDocumentId()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Autowired
@@ -59,32 +92,30 @@ public class SearchService {
      * 初始化 lucene 的索引
      */
     public void initSearch(boolean update) throws IOException {
-        IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-        //创建
-        iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+
 
         List<io.github.mylyed.lessdoc.persist.entity.Document> documents = documentMapper.selectByExampleWithBLOBs(new DocumentExample());
 
-        try (IndexWriter writer = new IndexWriter(directory, iwc)) {
+        try (IndexWriter writer = getIndexWriter()) {
             for (io.github.mylyed.lessdoc.persist.entity.Document document : documents) {
                 Document doc = buildLuceneDocument(document);
                 if (update) {
-                    writer.updateDocument(new Term("documentId", new BytesRef(document.getDocumentId())), doc);
-                } else {
-                    writer.addDocument(doc);
+                    //数值类型 不能删除
+//                    writer.updateDocument(new Term("documentId", document.getDocumentId().toString()), doc);
+                    writer.deleteDocuments(IntPoint.newExactQuery("documentId", document.getDocumentId()));
                 }
-
+                writer.addDocument(doc);
             }
-
         }
     }
 
 
     private Document buildLuceneDocument(io.github.mylyed.lessdoc.persist.entity.Document document) {
         Document doc = new Document();
-        doc.add(new StringField("documentId", String.valueOf(document.getDocumentId()), Field.Store.YES));
-        doc.add(new StringField("bookId", String.valueOf(document.getBookId()), Field.Store.YES));
+        doc.add(new IntPoint("documentId", document.getDocumentId()));
+        doc.add(new IntPoint("bookId", document.getBookId()));
         doc.add(new StringField("documentNameStr", document.getDocumentName(), Field.Store.YES));
+        doc.add(new StringField("releaseStr", document.getRelease(), Field.Store.YES));
 
         doc.add(new TextField("documentName", document.getDocumentName(), Field.Store.YES));
         doc.add(new TextField("release", document.getRelease(), Field.Store.YES));
@@ -111,23 +142,27 @@ public class SearchService {
         try (IndexReader reader = DirectoryReader.open(directory);) {
             List<io.github.mylyed.lessdoc.persist.entity.Document> list = new ArrayList<>();
             IndexSearcher searcher = new IndexSearcher(reader);
-            QueryParser parse = new QueryParser("documentName", analyzer);
-            Query query1 = parse.parse(key);
+            String ketWord = "*" + key + "*";
 
-            QueryParser parse2 = new QueryParser("release", analyzer);
-            Query query2 = parse2.parse(key);
+            Query query1 = new WildcardQuery(new Term("releaseStr", ketWord));
 
-            Term term = new Term("bookId", String.valueOf(bookId));
-            TermQuery termQuery = new TermQuery(term);
+            Query query2 = new WildcardQuery(new Term("documentNameStr", ketWord));
+
+
+            Query query3 = IntPoint.newExactQuery("bookId", bookId);
 
             BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
 
-//            booleanQuery.add(query1, BooleanClause.Occur.MUST);
-            booleanQuery.add(query2, BooleanClause.Occur.MUST);
-            booleanQuery.add(termQuery, BooleanClause.Occur.MUST);
+            booleanQuery.add(query1, BooleanClause.Occur.SHOULD);
+            booleanQuery.add(query2, BooleanClause.Occur.SHOULD);
 
 
-            TopDocs docs = searcher.search(booleanQuery.build(), Integer.MAX_VALUE);
+            BooleanQuery.Builder booleanQuery2 = new BooleanQuery.Builder();
+            booleanQuery2.add(query3, BooleanClause.Occur.MUST);
+            booleanQuery2.add(booleanQuery.build(), BooleanClause.Occur.MUST);
+
+            TopDocs docs = searcher.search(booleanQuery2.build(), Integer.MAX_VALUE);
+
             for (ScoreDoc scoreDoc : docs.scoreDocs) {
                 Document d = searcher.doc(scoreDoc.doc);
                 String json = d.getField("json").stringValue();
