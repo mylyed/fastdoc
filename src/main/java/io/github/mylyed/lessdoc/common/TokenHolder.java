@@ -20,4 +20,11 @@ public class TokenHolder {
         return (Member) ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                 .getRequest().getSession().getAttribute(Const.SessionKey.ACCOUNT);
     }
+
+    public static void setLoginedMember(Member member) {
+        ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest().getSession().setAttribute(Const.SessionKey.ACCOUNT, member);
+    }
+
+
 }

@@ -35,7 +35,7 @@
                             </div>
                             <div class="form-group">
                                 <label>真实姓名</label>
-                                <input type="text" name="real_name" class="form-control" value="${member.realName!}"
+                                <input type="text" name="realName" class="form-control" value="${member.realName!}"
                                        placeholder="真实姓名">
                             </div>
                             <div class="form-group">
@@ -58,13 +58,18 @@
                                 <button type="submit" class="btn btn-success" data-loading-text="保存中...">保存修改</button>
                                 <span id="form-error-message" class="error-message"></span>
                             </div>
+                            <div class="form-group">
+                                <input type="hidden" class="form-control" id="avatar" name="avatar"
+                                       value="${member.avatar}">
+                            </div>
                         </form>
                     </div>
                     <div class="form-right">
                         <label>
                             <a href="javascript:;" data-toggle="modal" data-target="#upload-logo-panel">
-                                <img src="${ctx}${member.avatar}" onerror="this.src='${ctx}/static/images/middle.gif" }'"
-                                class="img-circle" alt="头像" style="max-width: 120px;max-height: 120px;" id="headimgurl">
+                                <img src="${ctx}${member.avatar}" onerror="this.src='${ctx}/static/images/middle.gif"
+                                     class="img-circle" alt="头像" style="max-width: 120px;max-height: 120px;"
+                                     id="headimgurl">
                             </a>
                         </label>
                     </div>
@@ -150,8 +155,8 @@
             try {
                 var uploader = WebUploader.create({
                     auto: false,
-                    swf: '/static/webuploader/Uploader.swf',
-                    server: '{{urlfor "SettingController.Upload"}}',
+                    swf: "${ctx}/static/webuploader/Uploader.swf",
+                    server: "${ctx}/upload/image",
                     pick: "#filePicker",
                     fileVal: "image-file",
                     fileNumLimit: 1,
@@ -184,11 +189,12 @@
                     $("#error-message").text("上传失败:" + reason);
 
                 }).on("uploadSuccess", function (file, res) {
-
-                    if (res.errcode === 0) {
+                    console.debug("上传成功");
+                    if (res.success === 1) {
                         console.log(res);
                         $("#upload-logo-panel").modal('hide');
-                        $("#headimgurl").attr('src', res.data);
+                        $("#headimgurl").attr('src', res.uri);
+                        $("#avatar").val(res.uri);
                     } else {
                         $("#error-message").text(res.message);
                     }

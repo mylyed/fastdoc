@@ -32,7 +32,7 @@ public class UploadController {
      */
     @PostMapping("/upload/image")
     @RequiresUser
-    public EditormdResponse upload(@RequestParam(value = "editormd-image-file", required = false) MultipartFile file) {
+    public EditormdResponse upload(@RequestParam(value = "image-file", required = false) MultipartFile file) {
 
         if (file == null || file.isEmpty()) {
             return EditormdResponse.builder().success(0).message("没有上传数据").build();
@@ -69,8 +69,12 @@ public class UploadController {
 
             file.transferTo(dest);
 
+            String uri = "/static/images/" + fileName;
 
-            return EditormdResponse.builder().success(1).message("上传成功").url("http://127.0.0.1:8080/static/images/" + fileName).build();
+            EditormdResponse editormdResponse = EditormdResponse.builder().success(1).uri(uri).message("上传成功").url("http://127.0.0.1:8080" + uri).build();
+
+
+            return editormdResponse;
         } catch (Exception e) {
             log.error("上传失败", e);
             return EditormdResponse.builder().success(0).message("上传失败").build();

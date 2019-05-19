@@ -572,7 +572,7 @@
                         server: window.fileUploadURL,
                         formData: {"bookId": "${book.bookId}", "doc_id": window.selectNode.id},
                         pick: "#filePicker",
-                        fileVal: "editormd-file-file",
+                        fileVal: "image-file",
                         compress: false,
                         fileSingleSizeLimit: 1024 * 500
                     }).on("beforeFileQueued", function (file) {
