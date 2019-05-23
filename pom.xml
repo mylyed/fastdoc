@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.mylyed</groupId>
-    <artifactId>lessdoc</artifactId>
+    <artifactId>fastdoc</artifactId>
     <version>1.0-SNAPSHOT</version>
     <!-- Inherit defaults from Spring Boot -->
     <parent>
